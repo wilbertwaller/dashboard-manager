@@ -1,7 +1,23 @@
-import React from 'react'
+import React, { useEffect } from 'react'
+import { useDispatch } from 'react-redux'
+import { Navigate, useLocation } from 'react-router-dom'
+import { NavItem } from '../header/NavSection'
+import { notify, SEVERITY } from '../store/reducers/notificationReducer'
 
 export default function NotFound() {
+  const dispatch = useDispatch()
+  const location = useLocation()
+
+  useEffect(() => {
+    dispatch(
+      notify({
+        severity: SEVERITY.WARNING,
+        message: `${location.pathname} not found. Navigating back to home page.`
+      })
+    )
+  }, [dispatch, location.pathname])
+
   return (
-    <div>NotFound</div>
+    <Navigate to={NavItem.HOME.to} />
   )
 }
