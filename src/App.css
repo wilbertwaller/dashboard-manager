@@ -1,0 +1,5 @@
+.app-content {
+  flex-grow: 1;
+  overflow: auto;
+  padding: .25em 2rem;
+}
