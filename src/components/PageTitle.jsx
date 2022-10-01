@@ -3,7 +3,7 @@ import { values } from 'lodash'
 import { find } from 'lodash'
 import React, { useEffect, useState } from 'react'
 import { useLocation } from 'react-router-dom'
-import { NavItem } from '../header/NavSection'
+import { NavItem } from './NavSection'
 
 export default function PageTitle() {
   const location = useLocation()

@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react'
 import { useDispatch } from 'react-redux'
 import { Navigate, useLocation } from 'react-router-dom'
-import { NavItem } from '../header/NavSection'
+import { NavItem } from '../components/NavSection'
 import { notify, SEVERITY } from '../store/reducers/notificationReducer'
 
 export default function NotFound() {
