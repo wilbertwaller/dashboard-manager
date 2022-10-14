@@ -8,6 +8,7 @@ import { selectDashboardId, selectDashboards } from '../../../store/selectors/da
 import { FORM_TYPE } from '../../Form'
 import AddDashboard from '../dialogs/AddDashboard'
 import CloneDashboard from '../dialogs/CloneDashboard'
+import DeleteDashboard from '../dialogs/DeleteDashboard'
 
 export default function Controls() {
   const selected = useSelector(selectDashboardId)
@@ -22,6 +23,9 @@ export default function Controls() {
       )
       case FORM_TYPE.CLONE: return setForm(
         <CloneDashboard open={true} handleClose={handleClose} />
+      )
+      case FORM_TYPE.DELETE: return setForm(
+        <DeleteDashboard open={true} handleClose={handleClose} />
       )
       default:
     }
