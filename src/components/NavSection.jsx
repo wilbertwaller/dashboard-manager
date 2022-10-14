@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader } from "@mui/material";
 import { map } from "lodash";
 import React from "react";
 import { Link } from "react-router-dom";
+import DashboardManager from "../pages/DashboardManager";
 import Home from "../pages/Home";
 import NotFound from "../pages/NotFound";
 import Test from "../pages/Test";
@@ -24,6 +25,7 @@ export const getNavIcon = key => {
 
 export const NavItem = {
   HOME: { to: '/', label: 'Home', element: <Home /> },
+  DASHBOARD_MANAGER: { to: '/dashboard-manager', label: 'Dashboard Manager', element: <DashboardManager /> },
   TEST: { to: '/test', label: 'Test', element: <Test /> },
   NOT_FOUND: { to: '*', element: <NotFound /> }
 }

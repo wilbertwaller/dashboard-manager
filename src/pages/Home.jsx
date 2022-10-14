@@ -8,7 +8,8 @@ export default function Home() {
     {
       title: 'Admin',
       links: [
-        { to: '/test', label: 'Test', iconKey: NavIcon.SCIENCE }
+        { to: '/dashboard-manager', label: 'Dashboard Manager', iconKey: NavIcon.BUILD },
+        { to: '/test', label: 'Test', iconKey: NavIcon.SCIENCE },
       ]
     },
   ]
