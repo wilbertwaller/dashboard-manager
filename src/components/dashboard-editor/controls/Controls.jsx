@@ -7,6 +7,7 @@ import { setSelectedId } from '../../../store/reducers/dashboardReducer'
 import { selectDashboardId, selectDashboards } from '../../../store/selectors/dashboardSelector'
 import { FORM_TYPE } from '../../Form'
 import AddDashboard from '../dialogs/AddDashboard'
+import CloneDashboard from '../dialogs/CloneDashboard'
 
 export default function Controls() {
   const selected = useSelector(selectDashboardId)
@@ -18,6 +19,9 @@ export default function Controls() {
     switch (type) {
       case FORM_TYPE.NEW: return setForm(
         <AddDashboard open={true} handleClose={handleClose} />
+      )
+      case FORM_TYPE.CLONE: return setForm(
+        <CloneDashboard open={true} handleClose={handleClose} />
       )
       default:
     }
@@ -54,6 +58,7 @@ export default function Controls() {
               variant='contained'
               color='primary'
               startIcon={<ContentCopy />}
+              onClick={() => openDialog(FORM_TYPE.CLONE)}
             >
               Clone
             </Button>
@@ -63,6 +68,7 @@ export default function Controls() {
               variant='contained'
               color='error'
               startIcon={<Delete />}
+              onClick={() => openDialog(FORM_TYPE.DELETE)}
             >
               Delete
             </Button>

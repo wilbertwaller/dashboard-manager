@@ -1,5 +1,5 @@
 import { createSelector } from "@reduxjs/toolkit"
-import { find } from "lodash"
+import { filter, find, map } from "lodash"
 
 const selectDashboardState = state => state.dashboard
 
@@ -11,4 +11,13 @@ export const selectDashboard = createSelector(
   selectDashboards,
   selectDashboardId,
   (dashboards, id) => find(dashboards, d => d.id === id)
+)
+
+export const selectTitlesOfSelectedType = createSelector(
+  selectDashboards,
+  selectDashboard,
+  (dashboards, dashboard) => map(
+    filter(dashboards, d => d.isExercise === dashboard.isExercise),
+    'title'
+  )
 )
