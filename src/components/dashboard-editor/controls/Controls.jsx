@@ -1,35 +1,14 @@
-import { Add, ContentCopy, Delete } from '@mui/icons-material'
-import { Autocomplete, Button, Grid, TextField } from '@mui/material'
+import { Add, ContentCopy, Delete, Save } from '@mui/icons-material'
+import { Autocomplete, Button, Divider, Grid, TextField } from '@mui/material'
 import { find, map } from 'lodash'
-import React, { useState } from 'react'
+import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { setSelectedId } from '../../../store/reducers/dashboardReducer'
 import { selectDashboardId, selectDashboards } from '../../../store/selectors/dashboardSelector'
 import { FORM_TYPE } from '../../Form'
-import AddDashboard from '../dialogs/AddDashboard'
-import CloneDashboard from '../dialogs/CloneDashboard'
-import DeleteDashboard from '../dialogs/DeleteDashboard'
 
-export default function Controls() {
+export default function Controls({ openDialog }) {
   const selected = useSelector(selectDashboardId)
-  const [form, setForm] = useState(null)
-
-  const handleClose = () => setForm(null)
-
-  const openDialog = type => {
-    switch (type) {
-      case FORM_TYPE.NEW: return setForm(
-        <AddDashboard open={true} handleClose={handleClose} />
-      )
-      case FORM_TYPE.CLONE: return setForm(
-        <CloneDashboard open={true} handleClose={handleClose} />
-      )
-      case FORM_TYPE.DELETE: return setForm(
-        <DeleteDashboard open={true} handleClose={handleClose} />
-      )
-      default:
-    }
-  }
 
   return (
     <div>
@@ -47,7 +26,7 @@ export default function Controls() {
 
         <Grid item>
           <Button
-            variant='contained'
+            variant='outlined'
             color='primary'
             startIcon={<Add />}
             onClick={() => openDialog(FORM_TYPE.NEW)}
@@ -59,7 +38,7 @@ export default function Controls() {
         { selected && (<>
           <Grid item>
             <Button
-              variant='contained'
+              variant='outlined'
               color='primary'
               startIcon={<ContentCopy />}
               onClick={() => openDialog(FORM_TYPE.CLONE)}
@@ -69,7 +48,7 @@ export default function Controls() {
           </Grid>
           <Grid item>
             <Button
-              variant='contained'
+              variant='outlined'
               color='error'
               startIcon={<Delete />}
               onClick={() => openDialog(FORM_TYPE.DELETE)}
@@ -77,10 +56,21 @@ export default function Controls() {
               Delete
             </Button>
           </Grid>
+
+          <Divider orientation='vertical' flexItem sx={{ ml: 2 }} />
+
+          <Grid item>
+            <Button
+              variant='contained'
+              color='primary'
+              startIcon={<Save />}
+              type='submit'
+            >
+              Save
+            </Button>
+          </Grid>
         </>) }
       </Grid>
-
-      { form }
     </div>
   )
 }
