@@ -1,5 +1,6 @@
 import { Alert, FormHelperText, Grid } from '@mui/material'
 import { Form, Formik } from 'formik'
+import { cloneDeep } from 'lodash'
 import React from 'react'
 import { useDispatch } from 'react-redux'
 import * as yup from 'yup'
@@ -18,13 +19,16 @@ export default function AddDashboard({ open, handleClose }) {
   const validationSchema = yup.object({
     title: yup.string()
       .max(50, 'Must be 50 characters or less')
-      .required('Required'),
+      .required('Required')
+      .trim(),
     isExercise: yup.boolean()
       .required('Required')
   })
 
   const onSubmit = values => {
-    dispatch(saveDashboard(values))
+    const dashboard = cloneDeep(values)
+    dashboard.title = values.title.trim()
+    dispatch(saveDashboard(dashboard))
     handleClose()
   }
 
