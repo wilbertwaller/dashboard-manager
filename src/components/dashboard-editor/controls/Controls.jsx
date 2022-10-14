@@ -1,5 +1,6 @@
 import { Add, ContentCopy, Delete, Save } from '@mui/icons-material'
 import { Autocomplete, Button, Divider, Grid, TextField } from '@mui/material'
+import { useFormikContext } from 'formik'
 import { find, map } from 'lodash'
 import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
@@ -9,6 +10,7 @@ import { FORM_TYPE } from '../../Form'
 
 export default function Controls({ openDialog }) {
   const selected = useSelector(selectDashboardId)
+  const form = useFormikContext()
 
   return (
     <div>
@@ -65,6 +67,7 @@ export default function Controls({ openDialog }) {
               color='primary'
               startIcon={<Save />}
               type='submit'
+              disabled={!form.isValid}
             >
               Save
             </Button>
