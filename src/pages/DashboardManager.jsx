@@ -1,5 +1,6 @@
 import { Settings, ViewComfy } from '@mui/icons-material'
-import { Button, ButtonGroup } from '@mui/material'
+import { TabContext, TabList, TabPanel } from '@mui/lab'
+import { Box, Tab } from '@mui/material'
 import { Form, Formik } from 'formik'
 import { map } from 'lodash'
 import React, { useState } from 'react'
@@ -16,8 +17,16 @@ import { saveDashboard } from '../store/reducers/dashboardReducer'
 import { selectDashboard } from '../store/selectors/dashboardSelector'
 
 export const EDITOR = {
-  GENERAL: { selected: 'General', element: <General />, icon: <Settings /> },
-  LAYOUT: { selected: 'Layout', element: <Layout />, icon: <ViewComfy /> }
+  GENERAL: 'General',
+  LAYOUT: 'Layout'
+}
+
+export const getEditorProps = key => {
+  switch (key) {
+    case EDITOR.GENERAL: return { element: <General />, icon: <Settings /> }
+    case EDITOR.LAYOUT: return { element: <Layout />, icon: <ViewComfy /> }
+    default: return {}
+  }
 }
 
 export default function DashboardManager() {
@@ -38,8 +47,8 @@ export default function DashboardManager() {
     dispatch(saveDashboard(values))
   }
 
-  const handleEditorClick = key => {
-    setEditor(EDITOR[key])
+  const handleEditorClick = (e, value) => {
+    setEditor(value)
   }
 
   const handleClose = () => setDialogForm(null)
@@ -70,29 +79,38 @@ export default function DashboardManager() {
       <Form>
         <Controls openDialog={openDialog} />
 
-        { dashboard && (<>
-          <ButtonGroup
-            fullWidth
-            variant='contained'
-            sx={{ my: 2 }}
-          >
-            { map(Object.keys(EDITOR), (key, i) => {
-              const { icon, selected } = EDITOR[key]
+        { dashboard && (
+          <TabContext value={editor}>
+            <Box sx={{ border: 1, borderColor: 'divider' }}>
+              <TabList onChange={handleEditorClick} centered>
+                { map(Object.values(EDITOR), (key, i) => {
+                  const { icon } = getEditorProps(key)
+                  return (
+                    <Tab
+                      key={`editor-${i}-tab`}
+                      icon={icon}
+                      iconPosition='start'
+                      label={key}
+                      value={key}
+                    />
+                  )
+                }) }
+              </TabList>
+            </Box>
+            { map(Object.values(EDITOR), (key, i) => {
+              const { element } = getEditorProps(key)
               return (
-                <Button
-                  key={`editor-${i}-button`}
-                  color={editor.selected === selected ? 'success' : 'primary'}
-                  startIcon={icon}
-                  onClick={() => handleEditorClick(key)}
+                <TabPanel
+                  key={`editor-${i}-content`}
+                  value={key}
+                  sx={{ padding: '2rem 0' }}
                 >
-                  { selected }
-                </Button>
+                  { element }
+                </TabPanel>
               )
             }) }
-          </ButtonGroup>
-
-          { editor.element }
-        </>) }
+          </TabContext>
+        ) }
       </Form>
     </Formik>
 
