@@ -3,3 +3,11 @@
   overflow: auto;
   padding: .25em 2rem;
 }
+
+.layout {
+  background-color: lightblue;
+}
+
+.grid-item {
+  background-color: coral;
+}
