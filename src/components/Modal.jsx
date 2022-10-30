@@ -7,7 +7,11 @@ export default function Modal({ children, ...props }) {
   const { open, handleClose, title, actions } = props
 
   return (
-    <Dialog open={open} onClose={handleClose}>
+    <Dialog
+      open={open}
+      onClose={handleClose}
+      {...props}
+    >
       <DialogTitle>
         { title }
         <IconButton
