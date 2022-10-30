@@ -1,13 +1,14 @@
 import { Chat, List, TableChart } from '@mui/icons-material'
 import { Button, ButtonGroup, Tooltip } from '@mui/material'
 import { map } from 'lodash'
-import React from 'react'
+import React, { useContext } from 'react'
+import { EditorContext } from '../../../pages/DashboardManager'
 import Table from '../../table/Table'
-import TableConfig from '../../table/TableConfig'
+import TableConfig from '../dialogs/TableConfig'
 
 export const COMPONENT = {
   TABLE: {
-    config: <TableConfig />,
+    getConfig: props => <TableConfig {...props} />,
     element: <Table />,
     icon: <TableChart />,
     title: 'Table'
@@ -23,17 +24,23 @@ export const COMPONENT = {
 }
 
 export default function ComponentList({ handleClick }) {
+  const { setDialogForm } = useContext(EditorContext).actions
+  const props = {
+    open: true,
+    handleClose: () => setDialogForm(null)
+  }
+
   return (
     <div>
       <h3>Components</h3>
       <ButtonGroup variant='contained'>
         { map(Object.keys(COMPONENT), (key, i) => {
-          const { icon, title } = COMPONENT[key]
+          const { getConfig, icon, title } = COMPONENT[key]
           return (
             <Tooltip key={`component-${i}-tooltip`} title={title}>
               <Button
                 key={`component-${i}-button`}
-                onClick={() => handleClick(key)}
+                onClick={() => setDialogForm(getConfig(props))}
               >
                 { icon }
               </Button>
