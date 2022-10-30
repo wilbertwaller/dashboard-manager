@@ -1,6 +1,7 @@
 import { useFormikContext } from 'formik'
-import React from 'react'
+import React, { useState } from 'react'
 import ReactGridLayout, { WidthProvider } from 'react-grid-layout'
+import ComponentConfig from './ComponentConfig'
 import ComponentList from './ComponentList'
 
 import 'react-grid-layout/css/styles.css'
@@ -9,6 +10,9 @@ const GridLayout = WidthProvider(ReactGridLayout)
 
 export default function Layout() {
   const { values, setFieldValue } = useFormikContext()
+  const [component, setComponent] = useState()
+
+  const handleClick = component => setComponent(component)
 
   const layout = [
     { i: 'a', x: 0, y: 0, w: 12, h: 1 },
@@ -20,7 +24,9 @@ export default function Layout() {
 
   return (
     <div>
-      <ComponentList />
+      <ComponentList handleClick={handleClick} />
+
+      { component && <ComponentConfig component={component} /> }
 
       <h3>Layout</h3>
       <GridLayout
