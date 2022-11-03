@@ -1,4 +1,4 @@
-import { FormControl, FormControlLabel, FormLabel, Radio, RadioGroup, TextField } from '@mui/material'
+import { Checkbox, FormControl, FormControlLabel, FormHelperText, FormLabel, Radio, RadioGroup, TextField } from '@mui/material'
 import { useField } from 'formik'
 
 export const FORM_TYPE = {
@@ -10,6 +10,23 @@ export const FORM_TYPE = {
 /*
   These form field components are meant to be used under a formik context
 */
+
+export function BooleanCheckbox({ helperText, label, ...props }) {
+  const [field, , helper] = useField({ ...props, type: 'checkbox' })
+
+  return (<>
+    <FormControlLabel
+      {...field}
+      {...props}
+      control={<Checkbox checked={field.value} />}
+      label={label}
+      onChange={e => {
+        helper.setValue(e.target.checked)
+      }}
+    />
+    <FormHelperText>{ helperText }</FormHelperText>
+  </>)
+}
 
 export function Text({ helperText, ...props }) {
   const [field, meta] = useField(props)
