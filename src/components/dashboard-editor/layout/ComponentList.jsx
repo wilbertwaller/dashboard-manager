@@ -4,7 +4,7 @@ import { map } from 'lodash'
 import React, { useContext } from 'react'
 import { EditorContext } from '../../../pages/DashboardManager'
 import Table from '../../table/Table'
-import TableConfig from '../dialogs/TableConfig'
+import TableConfig from '../dialogs/table-config/TableConfig'
 
 export const COMPONENT = {
   TABLE: {
@@ -23,7 +23,7 @@ export const COMPONENT = {
   }
 }
 
-export default function ComponentList({ handleClick }) {
+export default function ComponentList() {
   const { setDialogForm } = useContext(EditorContext).actions
   const props = {
     open: true,
@@ -40,7 +40,12 @@ export default function ComponentList({ handleClick }) {
             <Tooltip key={`component-${i}-tooltip`} title={title}>
               <Button
                 key={`component-${i}-button`}
-                onClick={() => setDialogForm(getConfig(props))}
+                onClick={() => setDialogForm(
+                  getConfig({
+                    ...props,
+                    title: `Add ${title} Component`
+                  })
+                )}
               >
                 { icon }
               </Button>

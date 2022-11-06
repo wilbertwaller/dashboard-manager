@@ -4,13 +4,14 @@ import { useFormikContext } from 'formik'
 import React from 'react'
 
 export default function Modal({ children, ...props }) {
-  const { open, handleClose, title, actions } = props
+  const { open, handleClose, title, actions, fullWidth, maxWidth } = props
 
   return (
     <Dialog
       open={open}
       onClose={handleClose}
-      {...props}
+      fullWidth={fullWidth}
+      maxWidth={maxWidth}
     >
       <DialogTitle>
         { title }
