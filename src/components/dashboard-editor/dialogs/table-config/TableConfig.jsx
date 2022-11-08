@@ -65,7 +65,7 @@ export default function TableConfig({ open, handleClose, title }) {
 export function ColumnDefTable({ fieldArrayName, values }) {
   return (
     <FieldArray name={fieldArrayName}>
-      { ({ push, remove }) => (<>
+      { ({ push }) => (<>
         <Grid container spacing={2} alignItems='center'>
           <Grid item>
             <h3>Column Definition</h3>
