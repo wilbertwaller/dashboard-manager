@@ -1,3 +1,5 @@
+import DeleteButton from "../../../ag-grid/cell-renderers/DeleteButton"
+
 export const columnDefs = [
   {
     headerName: 'Columns',
@@ -100,6 +102,17 @@ export const columnDefs = [
         field: 'resizable',
         cellEditor: 'agSelectCellEditor',
         cellEditorParams: { values: [true, false] }
+      }
+    ]
+  },
+  {
+    headerName: 'Actions',
+    children: [
+      {
+        headerName: 'Delete',
+        cellRenderer: DeleteButton,
+        pinned: 'left',
+        width: 70
       }
     ]
   }
