@@ -1,5 +1,7 @@
 import { Chat, List, TableChart } from '@mui/icons-material'
 import { Button, ButtonGroup, Tooltip } from '@mui/material'
+import { useFormikContext } from 'formik'
+import { cloneDeep } from 'lodash'
 import { map } from 'lodash'
 import React, { useContext } from 'react'
 import { EditorContext } from '../../../pages/DashboardManager'
@@ -25,9 +27,27 @@ export const COMPONENT = {
 
 export default function ComponentList() {
   const { setDialogForm } = useContext(EditorContext).actions
+  const { values, setFieldValue } = useFormikContext()
   const props = {
     open: true,
     handleClose: () => setDialogForm(null)
+  }
+
+  const addComponentToDashboard = (config, type) => {
+    // TODO properly implement adding to layout
+    const { components = [], layout = [] } = values || {}
+    const updatedComponents = cloneDeep(components)
+    const updatedLayout = cloneDeep(layout)
+    updatedComponents.push({ config, id: config.id, type })
+    updatedLayout.push({
+      i: config.id,
+      x: layout.length*2%12,
+      y: Infinity,
+      w: 2,
+      h: 2
+    })
+    setFieldValue('components', updatedComponents)
+    setFieldValue('layout', updatedLayout)
   }
 
   return (
@@ -43,7 +63,8 @@ export default function ComponentList() {
                 onClick={() => setDialogForm(
                   getConfig({
                     ...props,
-                    title: `Add ${title} Component`
+                    title: `Add ${title} Component`,
+                    addComponent: values => addComponentToDashboard(values, key)
                   })
                 )}
               >
