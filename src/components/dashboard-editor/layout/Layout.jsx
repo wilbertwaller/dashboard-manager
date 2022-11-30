@@ -1,8 +1,10 @@
+import { Cancel } from '@mui/icons-material'
 import { useFormikContext } from 'formik'
-import { map } from 'lodash'
+import { filter, map } from 'lodash'
 import React from 'react'
 import ReactGridLayout, { WidthProvider } from 'react-grid-layout'
 import ComponentList from './ComponentList'
+import { noOp } from '../../Util'
 
 import 'react-grid-layout/css/styles.css'
 
@@ -20,6 +22,14 @@ export default function Layout() {
 
   const onLayoutChange = layout => setFieldValue('layout', layout)
 
+  const removeComponent = id => {
+    const components = values?.components || []
+    const updatedComponents = filter(components, component => component.id !== id)
+    const updatedLayout = filter(layout, gridItem => gridItem.i !== id)
+    setFieldValue('components', updatedComponents)
+    setFieldValue('layout', updatedLayout)
+  }
+
   return (
     <div>
       <ComponentList />
@@ -33,13 +43,14 @@ export default function Layout() {
         isBounded={true}
         onLayoutChange={onLayoutChange}
       >
-        { map(layout, item => createGridItem(item)) }
+        { map(layout, item => createGridItem(item, { removeComponent })) }
       </GridLayout>
     </div>
   )
 }
 
-export function createGridItem(item) {
+export function createGridItem(item, action = {}) {
+  const { removeComponent = noOp } = action;
   return (
     <div
       key={item.i}
@@ -47,6 +58,9 @@ export function createGridItem(item) {
       data-grid={item}
     >
       { item.i }
+      <span className='remove-layout-component' onClick={() => removeComponent(item.i)}>
+        <Cancel fontSize='small' />
+      </span>
     </div>
   )
 }
