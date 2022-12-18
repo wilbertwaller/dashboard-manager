@@ -15,9 +15,10 @@ export const colDef = {
   field: ''
 }
 
-export default function TableConfig({ open, handleClose, title }) {
+export default function TableConfig({ open, handleClose, title, addComponent }) {
   const columnDefsName = 'columnDefs'
   const defaultColDefName = 'defaultColDef'
+
   const initialValues = {
     id: uuid(),
     columnDefs: [],
@@ -25,6 +26,7 @@ export default function TableConfig({ open, handleClose, title }) {
       sortable: false
     }
   }
+  
   const validationSchema = yup.object({
     defaultColDef: yup.object({
       flex: yup.number().min(0, 'Must be a positive integer').integer('Must be an integer'),
@@ -32,10 +34,16 @@ export default function TableConfig({ open, handleClose, title }) {
     })
   })
 
+  const onSubmit = values => {
+    addComponent(values)
+    handleClose()
+  }
+
   return (
     <Formik
       initialValues={initialValues}
       validationSchema={validationSchema}
+      onSubmit={onSubmit}
     >
       { ({ values }) => (
         <Form>
