@@ -8,6 +8,7 @@ import { v4 as uuid } from 'uuid'
 import * as yup from 'yup'
 import { BooleanCheckbox, Text } from '../../../Form'
 import Modal, { FormActions } from '../../../Modal'
+import ColumnDefForm from './ColumnDefForm'
 import { columnDefs, defaultColDef } from './table-config-grid-props'
 
 export const colDef = {
@@ -59,9 +60,8 @@ export default function TableConfig({ open, handleClose, title, addComponent }) 
               fieldName={defaultColDefName}
               values={values}
             />
-            <ColumnDefTable
+            <ColumnDefForm
               fieldArrayName={columnDefsName}
-              values={values}
             />
           </Modal>
         </Form>
