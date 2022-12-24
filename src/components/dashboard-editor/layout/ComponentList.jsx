@@ -11,7 +11,7 @@ import TableConfig from '../dialogs/table-config/TableConfig'
 export const COMPONENT = {
   TABLE: {
     getConfig: props => <TableConfig {...props} />,
-    element: <Table />,
+    getComponent: props => <Table {...props} />,
     icon: <TableChart />,
     title: 'Table'
   },

@@ -75,6 +75,8 @@ export default function ColumnDefForm({ fieldArrayName }) {
     if (columnNumber < 0) columnDefs.push(values[tempFieldName])
     else columnDefs.splice(columnNumber, 1, values[tempFieldName])
 
+    delete values[tempFieldName]
+
     setIsEditing(false)
     setFieldValue(fieldArrayName, columnDefs)
     setFormPage(FORM.GENERAL)

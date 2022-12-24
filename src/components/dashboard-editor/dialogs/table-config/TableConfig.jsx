@@ -56,6 +56,7 @@ export default function TableConfig({ open, handleClose, title, addComponent }) 
             fullWidth
             maxWidth='lg'
           >
+            <Text label='Title' name='title' />
             <DefaultColDefConfig
               fieldName={defaultColDefName}
               values={values}
