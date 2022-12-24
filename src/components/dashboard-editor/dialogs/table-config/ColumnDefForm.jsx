@@ -1,10 +1,14 @@
 import { Cancel, DisplaySettings, FilterList, PushPin, Save, Settings, Sort as SortIcon, Title, WidthNormal } from '@mui/icons-material'
-import { Button, ButtonGroup, Grid, Tooltip } from '@mui/material'
+import { Button, ButtonGroup, Grid, MenuItem, Tooltip } from '@mui/material'
+import { AgGridReact } from 'ag-grid-react'
 import { useFormikContext } from 'formik'
-import { cloneDeep } from 'lodash'
+import { cloneDeep, isEmpty } from 'lodash'
 import { map } from 'lodash'
 import React, { useState } from 'react'
 import { BooleanCheckbox, Text } from '../../../Form'
+import DeleteButton from '../../../ag-grid/cell-renderers/DeleteButton'
+import EditButton from '../../../ag-grid/cell-renderers/EditButton'
+import { useCallback } from 'react'
 
 const FORM = {
   GENERAL: {
@@ -44,15 +48,17 @@ const FORM = {
   },
 }
 
-export default function ColumnDefForm({ fieldArrayName, columnDef }) {
+export default function ColumnDefForm({ fieldArrayName }) {
   const { setFieldValue, values } = useFormikContext()
   const [isEditing, setIsEditing] = useState(false)
+  const [columnNumber, setColumnNumber] = useState(-1)
   const [formPage, setFormPage] = useState(FORM.GENERAL)
 
   const tempFieldName = 'tempColumnDef'
   const colDef = {}
 
-  const editColumn = () => {
+  const editColumn = (columnDef, index) => {
+    setColumnNumber(index > -1 ? index : -1)
     setIsEditing(true)
     setFieldValue(tempFieldName, columnDef || colDef)
   }
@@ -65,7 +71,9 @@ export default function ColumnDefForm({ fieldArrayName, columnDef }) {
   
   const save = () => {
     const columnDefs = cloneDeep(values[fieldArrayName])
-    columnDefs.push(values[tempFieldName])
+
+    if (columnNumber < 0) columnDefs.push(values[tempFieldName])
+    else columnDefs.splice(columnNumber, 1, values[tempFieldName])
 
     setIsEditing(false)
     setFieldValue(fieldArrayName, columnDefs)
@@ -78,7 +86,7 @@ export default function ColumnDefForm({ fieldArrayName, columnDef }) {
       color='primary'
       disabled={isEditing}
       sx={{ my: 1 }}
-      onClick={editColumn}
+      onClick={() => editColumn()}
     >Add Column</Button>
 
     { isEditing && <div>
@@ -101,6 +109,8 @@ export default function ColumnDefForm({ fieldArrayName, columnDef }) {
 
       <FormActions cancel={cancel} save={save} />
     </div> }
+
+    <ConfiguredColumns onEdit={editColumn} fieldArrayName={fieldArrayName} values={values} />
   </div>)
 }
 
@@ -118,12 +128,6 @@ export function General({ fieldArrayName, title }) {
         <BooleanCheckbox
           label='Checkbox Selection'
           name={`${fieldArrayName}.checkboxSelection`}
-        />
-      </Grid>
-      <Grid item>
-        <Text
-          label='Type'
-          name={`${fieldArrayName}.type`}
         />
       </Grid>
     </Grid>
@@ -145,14 +149,27 @@ export function Display({ fieldArrayName, title }) {
 }
 
 export function Filter({ fieldArrayName, title }) {
+  const none = 'none'
+  const filterOptions = [none, 'agNumberColumnFilter', 'agTextColumnFilter', 'agDateColumnFilter']
   return (<div>
     <h3>{ title }</h3>
     <Grid container spacing={2}>
-      <Grid item>
+      <Grid item xs={3}>
         <Text
           label='Filter'
           name={`${fieldArrayName}.filter`}
-        />
+          fullWidth
+          select
+        >
+          { map(filterOptions, option => (
+            <MenuItem
+              key={option}
+              value={option === none ? '' : option}
+            >
+              { option }
+            </MenuItem>
+          )) }
+        </Text>
       </Grid>
     </Grid>
   </div>)
@@ -191,20 +208,30 @@ export function Header({ fieldArrayName, title }) {
 }
 
 export function Pinned({ fieldArrayName, title }) {
+  const pinnedOptions = ['left', 'right', null]
   return (<div>
     <h3>{ title }</h3>
     <Grid container spacing={2}>
-      <Grid item>
+      <Grid item xs={2}>
         <Text
           label='Pinned'
           name={`${fieldArrayName}.pinned`}
-        />
+          fullWidth
+          select
+        >
+          { map(pinnedOptions, option => (
+            <MenuItem key={option} value={option}>
+              { option === null ? 'null' : option }
+            </MenuItem>
+          )) }
+        </Text>
       </Grid>
     </Grid>
   </div>)
 }
 
 export function Sort({ fieldArrayName, title }) {
+  const sortOptions = ['asc', 'desc', null]
   return (<div>
     <h3>{ title }</h3>
     <Grid container spacing={2}>
@@ -214,16 +241,26 @@ export function Sort({ fieldArrayName, title }) {
           name={`${fieldArrayName}.sortable`}
         />
       </Grid>
-      <Grid item>
+      <Grid item xs={2}>
         <Text
           label='Sort'
           name={`${fieldArrayName}.sort`}
-        />
+          fullWidth
+          select
+        >
+          { map(sortOptions, option => (
+            <MenuItem key={option} value={option}>
+              { option === null ? 'null' : option }
+            </MenuItem>
+          )) }
+        </Text>
       </Grid>
       <Grid item>
         <Text
           label='Sort Index'
           name={`${fieldArrayName}.sortIndex`}
+          inputProps={{ min: 0 }}
+          type='number'
         />
       </Grid>
     </Grid>
@@ -238,12 +275,16 @@ export function Width({ fieldArrayName, title }) {
         <Text
           label='Flex'
           name={`${fieldArrayName}.flex`}
+          inputProps={{ min: 0 }}
+          type='number'
         />
       </Grid>
       <Grid item>
         <Text
           label='Width'
           name={`${fieldArrayName}.width`}
+          inputProps={{ min: 0 }}
+          type='number'
         />
       </Grid>
       <Grid item>
@@ -276,4 +317,53 @@ export function FormActions({ cancel, save }) {
       Save
     </Button>
   </div>)
+}
+
+export function ConfiguredColumns({ onEdit, fieldArrayName, values }) {
+  const { setFieldValue } = useFormikContext()
+  const columnDefs = [
+    { headerName: 'Field', field: 'field', rowDrag: true },
+    {
+      headerName: 'Edit',
+      cellRenderer: EditButton,
+      cellRendererParams: { onEdit },
+      pinned: 'right',
+      width: 75
+    },
+    {
+      headerName: 'Delete',
+      cellRenderer: DeleteButton,
+      pinned: 'right',
+      width: 75
+    }
+  ]
+  const defaultColDef = {
+    flex: 1,
+    resizable: true,
+    autoHeaderHeight: true,
+    wrapHeaderText: true
+  }
+
+  const onRowDragEnd = useCallback(({ api }) => {
+    // Set new order of columns
+    const columns = []
+    api.forEachNode(node => columns.push(node.data))
+    setFieldValue(fieldArrayName, columns)
+  }, [setFieldValue, fieldArrayName])
+
+  if (isEmpty(values?.columnDefs)) return
+
+  return (<>
+    <h3>Configured Columns</h3>
+    <div className="ag-theme-alpine" style={{ height: '300px', marginTop: '1rem', width: '100%' }}>
+      <AgGridReact
+        rowData={values?.columnDefs || []}
+        columnDefs={columnDefs}
+        defaultColDef={defaultColDef}
+        rowDragManaged={true}
+        animateRows={true}
+        onRowDragEnd={onRowDragEnd}
+      />
+    </div>
+  </>)
 }
