@@ -1,14 +1,17 @@
 import { Chat, List, TableChart } from '@mui/icons-material'
 import { Button, ButtonGroup, Tooltip } from '@mui/material'
+import { useFormikContext } from 'formik'
+import { cloneDeep } from 'lodash'
 import { map } from 'lodash'
-import React from 'react'
+import React, { useContext } from 'react'
+import { EditorContext } from '../../../pages/DashboardManager'
 import Table from '../../table/Table'
-import TableConfig from '../../table/TableConfig'
+import TableConfig from '../dialogs/table-config/TableConfig'
 
 export const COMPONENT = {
   TABLE: {
-    config: <TableConfig />,
-    element: <Table />,
+    getConfig: props => <TableConfig {...props} />,
+    getComponent: props => <Table {...props} />,
     icon: <TableChart />,
     title: 'Table'
   },
@@ -22,18 +25,48 @@ export const COMPONENT = {
   }
 }
 
-export default function ComponentList({ handleClick }) {
+export default function ComponentList() {
+  const { setDialogForm } = useContext(EditorContext).actions
+  const { values, setFieldValue } = useFormikContext()
+  const props = {
+    open: true,
+    handleClose: () => setDialogForm(null)
+  }
+
+  const addComponentToDashboard = (config, type) => {
+    // TODO properly implement adding to layout
+    const { components = [], layout = [] } = values || {}
+    const updatedComponents = cloneDeep(components)
+    const updatedLayout = cloneDeep(layout)
+    updatedComponents.push({ config, id: config.id, type })
+    updatedLayout.push({
+      i: config.id,
+      x: layout.length*2%12,
+      y: Infinity,
+      w: 2,
+      h: 2
+    })
+    setFieldValue('components', updatedComponents)
+    setFieldValue('layout', updatedLayout)
+  }
+
   return (
     <div>
       <h3>Components</h3>
       <ButtonGroup variant='contained'>
         { map(Object.keys(COMPONENT), (key, i) => {
-          const { icon, title } = COMPONENT[key]
+          const { getConfig, icon, title } = COMPONENT[key]
           return (
             <Tooltip key={`component-${i}-tooltip`} title={title}>
               <Button
                 key={`component-${i}-button`}
-                onClick={() => handleClick(key)}
+                onClick={() => setDialogForm(
+                  getConfig({
+                    ...props,
+                    title: `Add ${title} Component`,
+                    addComponent: values => addComponentToDashboard(values, key)
+                  })
+                )}
               >
                 { icon }
               </Button>
