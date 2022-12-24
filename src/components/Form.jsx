@@ -28,7 +28,13 @@ export function BooleanCheckbox({ helperText, label, ...props }) {
   </>)
 }
 
-export function Text({ helperText, ...props }) {
+/**
+ * Standard mui TextField. Provide 'select' prop & MenuItem options
+ * as children to turn TextField into a mui Select component. 
+ * @param {*} param0 
+ * @returns 
+ */
+export function Text({ children, helperText, ...props }) {
   const [field, meta] = useField(props)
   const error = !!(meta.touched && meta.error)
 
@@ -39,7 +45,9 @@ export function Text({ helperText, ...props }) {
       value={field.value || ''}
       helperText={error ? <span className='error'>{meta.error}</span> : helperText}
       error={error}
-    />
+    >
+      { props.select && children }
+    </TextField>
   )
 }
 
