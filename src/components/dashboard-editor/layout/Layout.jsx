@@ -51,6 +51,7 @@ export function createGridItem(item, components, action = {}) {
       key={item.i}
       className='grid-item'
       data-grid={item}
+      style={{ overflow: 'auto' }}
     >
       { component ? COMPONENT[component.type].getComponent(component.config) : item.i }
       <span className='remove-layout-component' onClick={() => removeComponent(item.i)}>
