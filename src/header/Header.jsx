@@ -1,10 +1,14 @@
-import { Apps } from '@mui/icons-material'
-import { AppBar, IconButton, Toolbar } from '@mui/material'
-import React from 'react'
+import { Apps, Brightness4, Brightness7 } from '@mui/icons-material'
+import { AppBar, IconButton, Toolbar, useTheme } from '@mui/material'
+import React, { useContext } from 'react'
 import { Link } from 'react-router-dom'
+import { ColorModeContext } from '../App'
 import PageTitle from '../components/PageTitle'
 
 export default function Header() {
+  const theme = useTheme()
+  const colorMode = useContext(ColorModeContext)
+
   return (
     <AppBar position='static'>
       <Toolbar>
@@ -21,6 +25,13 @@ export default function Header() {
 
         <PageTitle />
 
+        <IconButton
+          color='inherit'
+          sx={{ ml: 'auto' }}
+          onClick={colorMode.toggleColorMode}
+        >
+          { theme.palette.mode === 'dark' ? <Brightness7 /> : <Brightness4 /> }
+        </IconButton>
       </Toolbar>
     </AppBar>
   )
