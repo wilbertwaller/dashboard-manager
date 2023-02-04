@@ -16,11 +16,11 @@ export const colDef = {
   field: ''
 }
 
-export default function TableConfig({ open, handleClose, title, addComponent }) {
+export default function TableConfig({ open, handleClose, title, saveComponent, config }) {
   const columnDefsName = 'columnDefs'
   const defaultColDefName = 'defaultColDef'
 
-  const initialValues = {
+  const initialValues = config || {
     id: uuid(),
     columnDefs: [],
     defaultColDef: {
@@ -36,7 +36,7 @@ export default function TableConfig({ open, handleClose, title, addComponent }) 
   })
 
   const onSubmit = values => {
-    addComponent(values)
+    saveComponent(values)
     handleClose()
   }
 

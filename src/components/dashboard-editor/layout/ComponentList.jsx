@@ -64,7 +64,7 @@ export default function ComponentList() {
                   getConfig({
                     ...props,
                     title: `Add ${title} Component`,
-                    addComponent: values => addComponentToDashboard(values, key)
+                    saveComponent: values => addComponentToDashboard(values, key)
                   })
                 )}
               >
