@@ -4,17 +4,16 @@ import { Box, Tab } from '@mui/material'
 import { Form, Formik } from 'formik'
 import { map } from 'lodash'
 import React, { useState } from 'react'
+import { createContext } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import * as yup from 'yup'
 import Controls from '../components/dashboard-editor/controls/Controls'
-import AddDashboard from '../components/dashboard-editor/dialogs/AddDashboard'
-import CloneDashboard from '../components/dashboard-editor/dialogs/CloneDashboard'
-import DeleteDashboard from '../components/dashboard-editor/dialogs/DeleteDashboard'
 import General from '../components/dashboard-editor/general/General'
 import Layout from '../components/dashboard-editor/layout/Layout'
-import { FORM_TYPE } from '../components/Form'
 import { saveDashboard } from '../store/reducers/dashboardReducer'
 import { selectDashboard } from '../store/selectors/dashboardSelector'
+
+export const EditorContext = createContext()
 
 export const EDITOR = {
   GENERAL: 'General',
@@ -51,69 +50,58 @@ export default function DashboardManager() {
     setEditor(value)
   }
 
-  const handleClose = () => setDialogForm(null)
-
-  const openDialog = type => {
-    switch (type) {
-      case FORM_TYPE.NEW: return setDialogForm(
-        <AddDashboard open={true} handleClose={handleClose} />
-      )
-      case FORM_TYPE.CLONE: return setDialogForm(
-        <CloneDashboard open={true} handleClose={handleClose} />
-      )
-      case FORM_TYPE.DELETE: return setDialogForm(
-        <DeleteDashboard open={true} handleClose={handleClose} />
-      )
-      default:
-    }
-  }
-
   return (<>
-    <Formik
-      initialValues={dashboard}
-      validationSchema={validationSchema}
-      onSubmit={onSubmit}
-      enableReinitialize
-      validateOnMount
+    <EditorContext.Provider
+      value={{
+        actions: { setDialogForm }
+      }}
     >
-      <Form>
-        <Controls openDialog={openDialog} />
+      <Formik
+        initialValues={dashboard}
+        validationSchema={validationSchema}
+        onSubmit={onSubmit}
+        enableReinitialize
+        validateOnMount
+      >
+        <Form>
+          <Controls />
 
-        { dashboard && (
-          <TabContext value={editor}>
-            <Box sx={{ border: 1, borderColor: 'divider' }}>
-              <TabList onChange={handleEditorClick} centered>
-                { map(Object.values(EDITOR), (key, i) => {
-                  const { icon } = getEditorProps(key)
-                  return (
-                    <Tab
-                      key={`editor-${i}-tab`}
-                      icon={icon}
-                      iconPosition='start'
-                      label={key}
-                      value={key}
-                    />
-                  )
-                }) }
-              </TabList>
-            </Box>
-            { map(Object.values(EDITOR), (key, i) => {
-              const { element } = getEditorProps(key)
-              return (
-                <TabPanel
-                  key={`editor-${i}-content`}
-                  value={key}
-                  sx={{ padding: '2rem 0' }}
-                >
-                  { element }
-                </TabPanel>
-              )
-            }) }
-          </TabContext>
-        ) }
-      </Form>
-    </Formik>
+          { dashboard && (
+            <TabContext value={editor}>
+              <Box sx={{ border: 1, borderColor: 'divider' }}>
+                <TabList onChange={handleEditorClick} centered>
+                  { map(Object.values(EDITOR), (key, i) => {
+                    const { icon } = getEditorProps(key)
+                    return (
+                      <Tab
+                        key={`editor-${i}-tab`}
+                        icon={icon}
+                        iconPosition='start'
+                        label={key}
+                        value={key}
+                      />
+                    )
+                  }) }
+                </TabList>
+              </Box>
+              { map(Object.values(EDITOR), (key, i) => {
+                const { element } = getEditorProps(key)
+                return (
+                  <TabPanel
+                    key={`editor-${i}-content`}
+                    value={key}
+                    sx={{ padding: '2rem 0' }}
+                  >
+                    { element }
+                  </TabPanel>
+                )
+              }) }
+            </TabContext>
+          ) }
+        </Form>
+      </Formik>
 
     { dialogForm }
+    </EditorContext.Provider>
   </>)
 }

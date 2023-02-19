@@ -1,22 +1,53 @@
+import { Cancel, Edit } from '@mui/icons-material'
 import { useFormikContext } from 'formik'
+import { filter, find, map } from 'lodash'
 import React from 'react'
 import ReactGridLayout, { WidthProvider } from 'react-grid-layout'
-import ComponentList from './ComponentList'
+import ComponentList, { COMPONENT } from './ComponentList'
+import { noOp } from '../../Util'
 
 import 'react-grid-layout/css/styles.css'
+import { useContext } from 'react'
+import { EditorContext } from '../../../pages/DashboardManager'
 
 const GridLayout = WidthProvider(ReactGridLayout)
 
 export default function Layout() {
+  const { setDialogForm } = useContext(EditorContext).actions
   const { values, setFieldValue } = useFormikContext()
-
-  const layout = [
-    { i: 'a', x: 0, y: 0, w: 12, h: 1 },
-    { i: 'b', x: 1, y: 0, w: 3, h: 1, minW: 2, maxW: 4 },
-    { i: 'c', x: 4, y: 0, w: 1, h: 1 }
-  ]
+  const layout = values?.layout || []
+  const components = values?.components || []
 
   const onLayoutChange = layout => setFieldValue('layout', layout)
+
+  const editComponent = id => {
+    const componentConfig = find(components, ['id', id])
+    const component = COMPONENT[componentConfig.type]
+    setDialogForm(
+      component.getConfig({
+        open: true,
+        handleClose: () => setDialogForm(null),
+        title: `Edit ${component.title} Component`,
+        saveComponent: updateComponent,
+        config: componentConfig.config
+      })
+    )
+  }
+
+  const updateComponent = values => {
+    const updatedComponents = map(components, component => {
+      if (component.id === values.id) return { ...component, config: values }
+      return component
+    })
+    setFieldValue('components', updatedComponents)
+  }
+
+  const removeComponent = id => {
+    const updatedComponents = filter(components, component => component.id !== id)
+    const updatedLayout = filter(layout, gridItem => gridItem.i !== id)
+    setFieldValue('components', updatedComponents)
+    setFieldValue('layout', updatedLayout)
+  }
 
   return (
     <div>
@@ -25,16 +56,35 @@ export default function Layout() {
       <h3>Layout</h3>
       <GridLayout
         className='layout'
-        layout={values?.layout || layout}
+        layout={layout}
         cols={12}
         isResizable={true}
         isBounded={true}
         onLayoutChange={onLayoutChange}
       >
-        <div key="a" className="grid-item">a</div>
-        <div key="b" className="grid-item">b</div>
-        <div key="c" className="grid-item">c</div>
+        { map(layout, item => createGridItem(item, components, { editComponent, removeComponent })) }
       </GridLayout>
+    </div>
+  )
+}
+
+export function createGridItem(item, components, action = {}) {
+  const component = find(components, component => component.id === item.i)
+  const { editComponent = noOp, removeComponent = noOp } = action;
+  return (
+    <div
+      key={item.i}
+      className='grid-item'
+      data-grid={item}
+      style={{ overflow: 'auto' }}
+    >
+      { component ? COMPONENT[component.type].getComponent(component.config) : item.i }
+      <span className='edit-layout-component' onClick={() => editComponent(item.i)}>
+        <Edit fontSize='small' />
+      </span>
+      <span className='remove-layout-component' onClick={() => removeComponent(item.i)}>
+        <Cancel fontSize='small' />
+      </span>
     </div>
   )
 }
