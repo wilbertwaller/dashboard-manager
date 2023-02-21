@@ -1,5 +1,5 @@
 import { Cancel, DisplaySettings, FilterList, PushPin, Save, Settings, Sort as SortIcon, Title, WidthNormal } from '@mui/icons-material'
-import { Button, ButtonGroup, Grid, MenuItem, Tooltip } from '@mui/material'
+import { Button, Grid, MenuItem } from '@mui/material'
 import { AgGridReact } from 'ag-grid-react'
 import { useFormikContext } from 'formik'
 import { cloneDeep, isEmpty } from 'lodash'
@@ -9,6 +9,7 @@ import { BooleanCheckbox, Text } from '../../../Form'
 import DeleteButton from '../../../ag-grid/cell-renderers/DeleteButton'
 import EditButton from '../../../ag-grid/cell-renderers/EditButton'
 import { useCallback } from 'react'
+import Tabs from '../../../Tabs'
 
 const FORM = {
   GENERAL: {
@@ -48,14 +49,20 @@ const FORM = {
   },
 }
 
+const defaultPage = 'Columns'
+
 export default function ColumnDefForm({ fieldArrayName }) {
   const { setFieldValue, values } = useFormikContext()
   const [isEditing, setIsEditing] = useState(false)
   const [columnNumber, setColumnNumber] = useState(-1)
-  const [formPage, setFormPage] = useState(FORM.GENERAL)
+  const [formPage, setFormPage] = useState(defaultPage)
 
   const tempFieldName = 'tempColumnDef'
   const colDef = {}
+
+  const handleFormPageClick = (e, value) => {
+    setFormPage(value)
+  }
 
   const editColumn = (columnDef, index) => {
     setColumnNumber(index > -1 ? index : -1)
@@ -66,7 +73,7 @@ export default function ColumnDefForm({ fieldArrayName }) {
   const cancel = () => {
     setIsEditing(false)
     setFieldValue(tempFieldName, colDef)
-    setFormPage(FORM.GENERAL)
+    setFormPage(defaultPage)
   }
   
   const save = () => {
@@ -79,8 +86,20 @@ export default function ColumnDefForm({ fieldArrayName }) {
 
     setIsEditing(false)
     setFieldValue(fieldArrayName, columnDefs)
-    setFormPage(FORM.GENERAL)
+    setFormPage(defaultPage)
   }
+
+  const tabList = map(
+    Object.values(FORM),
+    item => ({
+      element: <div>
+        { item.getPage({ fieldArrayName: tempFieldName, title: formPage.title }) }
+        <FormActions cancel={cancel} save={save} />
+      </div>,
+      icon: item.icon,
+      selected: item.title
+    })  
+  )
 
   return (<div>
     <Button
@@ -91,26 +110,15 @@ export default function ColumnDefForm({ fieldArrayName }) {
       onClick={() => editColumn()}
     >Add Column</Button>
 
-    { isEditing && <div>
-      <ButtonGroup variant='contained'>
-        { map(Object.keys(FORM), (key, i) => {
-          const { icon, title } = FORM[key]
-          return (
-            <Tooltip key={`column-def-page-${i}-tooltip`} title={title}>
-              <Button
-                key={`column-def-page-${i}-button`}
-                color={formPage.title === title ? 'success' : 'primary'}
-                onClick={() => setFormPage(FORM[key])}
-              >{ icon }</Button>
-            </Tooltip>
-          )
-        }) }
-      </ButtonGroup>
-
-      { formPage.getPage({ fieldArrayName: tempFieldName, title: formPage.title }) }
-
-      <FormActions cancel={cancel} save={save} />
-    </div> }
+    { isEditing && (
+      <Tabs
+        context='column-def-page'
+        value={formPage}
+        onChange={handleFormPageClick}
+        list={tabList}
+        iconOnly
+      />
+    ) }
 
     <ConfiguredColumns onEdit={editColumn} fieldArrayName={fieldArrayName} values={values} />
   </div>)
