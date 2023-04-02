@@ -1,7 +1,7 @@
-import { Add, Cancel } from '@mui/icons-material'
-import { Button, Grid, Tooltip } from '@mui/material'
+import { Add, Cancel, Preview } from '@mui/icons-material'
+import { Button, Grid, IconButton, InputAdornment, Tooltip } from '@mui/material'
 import { AgGridReact } from 'ag-grid-react'
-import { FieldArray, Form, Formik } from 'formik'
+import { FieldArray, Form, Formik, useFormikContext } from 'formik'
 import { map } from 'lodash'
 import React from 'react'
 import { v4 as uuid } from 'uuid'
@@ -56,7 +56,7 @@ export default function TableConfig({ open, handleClose, title, saveComponent, c
             fullWidth
             maxWidth='lg'
           >
-            <Text label='Title' name='title' />
+            <GeneralTableConfig />
             <DefaultColDefConfig
               fieldName={defaultColDefName}
               values={values}
@@ -68,6 +68,40 @@ export default function TableConfig({ open, handleClose, title, saveComponent, c
         </Form>
       ) }
     </Formik>
+  )
+}
+
+export function GeneralTableConfig() {
+  const { values } = useFormikContext()
+
+  const previewUrl = (event) => {
+    const url = values.url
+  }
+
+  return (
+    <Grid container spacing={2}>
+      <Grid item>
+        <Text label='Title' name='title' />
+      </Grid>
+      <Grid item xs={4}>
+        <Text
+          label='URL'
+          name='url'
+          fullWidth
+          InputProps={{
+            endAdornment:
+              <InputAdornment position='end' title='Preview'>
+                <IconButton onClick={previewUrl}>
+                  <Preview />
+                </IconButton>
+              </InputAdornment>
+          }}
+        />
+      </Grid>
+      <Grid item>
+        <code></code>
+      </Grid>
+    </Grid>
   )
 }
 
