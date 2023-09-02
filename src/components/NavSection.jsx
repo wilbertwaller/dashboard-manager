@@ -1,4 +1,4 @@
-import { ArrowForward, Build, Dashboard, Science } from "@mui/icons-material";
+import { ArrowForward, Build, Dashboard as DashboardIcon, Science } from "@mui/icons-material";
 import { Card, CardContent, CardHeader } from "@mui/material";
 import { map } from "lodash";
 import React from "react";
@@ -7,6 +7,7 @@ import DashboardManager from "../pages/DashboardManager";
 import Home from "../pages/Home";
 import NotFound from "../pages/NotFound";
 import Test from "../pages/Test";
+import Dashboard from "../pages/Dashboard";
 
 export const NavIcon = {
   BUILD: 'BUILD',
@@ -17,7 +18,7 @@ export const NavIcon = {
 export const getNavIcon = key => {
   switch (key) {
     case NavIcon.BUILD: return <Build />
-    case NavIcon.DASHBOARD: return <Dashboard />
+    case NavIcon.DASHBOARD: return <DashboardIcon />
     case NavIcon.SCIENCE: return <Science />
     default: return <ArrowForward />
   }
@@ -26,6 +27,7 @@ export const getNavIcon = key => {
 export const NavItem = {
   HOME: { to: '/', label: 'Home', element: <Home /> },
   DASHBOARD_MANAGER: { to: '/dashboard-manager', label: 'Dashboard Manager', element: <DashboardManager /> },
+  DASHBOARD: { to: '/dashboards/:id', label: 'Dashboard', element: <Dashboard /> },
   TEST: { to: '/test', label: 'Test', element: <Test /> },
   NOT_FOUND: { to: '*', element: <NotFound /> }
 }

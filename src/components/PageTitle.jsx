@@ -5,15 +5,15 @@ import React, { useEffect, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import { NavItem } from './NavSection'
 
-export default function PageTitle() {
+export default function PageTitle({ pageTitle }) {
   const location = useLocation()
   const [title, setTitle] = useState('')
 
   useEffect(() => {
-    const label = find(values(NavItem), ['to', location.pathname])?.label || ''
+    const label = pageTitle || find(values(NavItem), ['to', location.pathname])?.label || ''
     document.title = label
     setTitle(label)
-  }, [location.pathname])
+  }, [pageTitle, location.pathname])
 
   return (
     <Typography variant='h6'>{title}</Typography>
